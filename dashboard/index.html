@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidaXL Digital Footprint</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>VidaXL Digital Footprint</h1>
+        <div class="header-actions">
+            <button id="btn-scrape" onclick="triggerScrape()">Scrape All Sources</button>
+            <button id="btn-analyze" onclick="triggerAnalysis()">Run Analysis</button>
+            <span id="status-msg"></span>
+        </div>
+    </header>
+
+    <main>
+        <!-- KPI Cards -->
+        <section class="kpi-cards" id="kpi-section">
+            <div class="card">
+                <div class="card-label">Total Reviews</div>
+                <div class="card-value" id="kpi-total">—</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Avg Rating</div>
+                <div class="card-value" id="kpi-rating">—</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Sentiment Score</div>
+                <div class="card-value" id="kpi-sentiment">—</div>
+            </div>
+            <div class="card">
+                <div class="card-label">Active Sources</div>
+                <div class="card-value" id="kpi-sources">—</div>
+            </div>
+        </section>
+
+        <!-- Charts Row -->
+        <section class="charts-row">
+            <div class="chart-container">
+                <h2>Sentiment Distribution</h2>
+                <canvas id="sentimentDoughnut"></canvas>
+            </div>
+            <div class="chart-container wide">
+                <h2>Sentiment Trend</h2>
+                <canvas id="sentimentTrend"></canvas>
+            </div>
+        </section>
+
+        <!-- Top Complaints -->
+        <section class="section">
+            <h2>Top Complaints</h2>
+            <table id="complaints-table">
+                <thead>
+                    <tr>
+                        <th>Theme</th>
+                        <th>Frequency</th>
+                        <th>Severity</th>
+                        <th>Category</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody id="complaints-body"></tbody>
+            </table>
+        </section>
+
+        <!-- Product Rankings -->
+        <section class="section products-row">
+            <div>
+                <h2>Best Rated Products</h2>
+                <table id="best-products">
+                    <thead><tr><th>Product</th><th>Avg Rating</th><th>Reviews</th></tr></thead>
+                    <tbody id="best-products-body"></tbody>
+                </table>
+            </div>
+            <div>
+                <h2>Worst Rated Products</h2>
+                <table id="worst-products">
+                    <thead><tr><th>Product</th><th>Avg Rating</th><th>Reviews</th></tr></thead>
+                    <tbody id="worst-products-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Source Breakdown -->
+        <section class="section">
+            <h2>Source Breakdown</h2>
+            <div class="chart-container">
+                <canvas id="sourceChart"></canvas>
+            </div>
+        </section>
+
+        <!-- AI Insights -->
+        <section class="section" id="insights-section">
+            <h2>AI Insights & Recommendations</h2>
+            <div id="insights-content" class="insights-panel">
+                <p class="placeholder">Run analysis to generate insights...</p>
+            </div>
+        </section>
+
+        <!-- Recent Reviews -->
+        <section class="section">
+            <h2>Recent Reviews</h2>
+            <div id="reviews-feed" class="reviews-feed"></div>
+            <button id="btn-load-more" onclick="loadMoreReviews()" style="display:none">Load More</button>
+        </section>
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

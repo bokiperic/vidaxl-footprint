@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vidaxl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vidaxl}
+      POSTGRES_DB: ${POSTGRES_DB:-vidaxl_footprint}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vidaxl -d vidaxl_footprint"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vidaxl}:${POSTGRES_PASSWORD:-vidaxl}@db:5432/${POSTGRES_DB:-vidaxl_footprint}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./dashboard:/app/dashboard
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
+
+volumes:
+  pgdata:
