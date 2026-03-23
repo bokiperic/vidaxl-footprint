@@ -138,6 +138,7 @@ async function loadComplaints() {
         tbody.innerHTML = '';
         for (const c of (data.complaints || [])) {
             const tr = document.createElement('tr');
+            tr.setAttribute('data-testid', 'complaints-row');
             tr.innerHTML = `
                 <td><strong>${esc(c.theme)}</strong></td>
                 <td>${c.frequency}</td>
@@ -264,6 +265,7 @@ async function loadReviews() {
         for (const r of (data.items || [])) {
             const div = document.createElement('div');
             div.className = 'review-item';
+            div.setAttribute('data-testid', 'review-item');
 
             const stars = r.rating ? '★'.repeat(Math.round(r.rating)) + '☆'.repeat(5 - Math.round(r.rating)) : '';
             const sentBadge = r.sentiment ? `<span class="sentiment-badge sentiment-${r.sentiment}">${r.sentiment}</span>` : '';
@@ -271,7 +273,7 @@ async function loadReviews() {
 
             div.innerHTML = `
                 <div class="review-header">
-                    <span class="review-author">${esc(r.author || 'Anonymous')} ${sentBadge}</span>
+                    <span class="review-author" data-testid="review-author">${esc(r.author || 'Anonymous')} ${sentBadge}</span>
                     <span class="review-date">${r.review_date || ''}</span>
                 </div>
                 ${stars ? `<div class="review-rating">${stars}</div>` : ''}

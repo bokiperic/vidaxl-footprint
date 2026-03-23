@@ -9,32 +9,32 @@
 </head>
 <body>
     <header>
-        <h1>VidaXL Digital Footprint</h1>
+        <h1 data-testid="header-title">VidaXL Digital Footprint</h1>
         <div class="header-actions">
-            <button id="btn-scrape" onclick="triggerScrape()">Scrape All Sources</button>
-            <button id="btn-analyze" onclick="triggerAnalysis()">Run Analysis</button>
-            <span id="status-msg"></span>
+            <button id="btn-scrape" data-testid="btn-scrape" onclick="triggerScrape()">Scrape All Sources</button>
+            <button id="btn-analyze" data-testid="btn-analyze" onclick="triggerAnalysis()">Run Analysis</button>
+            <span id="status-msg" data-testid="status-msg"></span>
         </div>
     </header>
 
     <main>
         <!-- KPI Cards -->
-        <section class="kpi-cards" id="kpi-section">
-            <div class="card">
+        <section class="kpi-cards" id="kpi-section" data-testid="kpi-section">
+            <div class="card" data-testid="kpi-total-card">
                 <div class="card-label">Total Reviews</div>
-                <div class="card-value" id="kpi-total">—</div>
+                <div class="card-value" id="kpi-total" data-testid="kpi-total">—</div>
             </div>
-            <div class="card">
+            <div class="card" data-testid="kpi-rating-card">
                 <div class="card-label">Avg Rating</div>
                 <div class="card-value" id="kpi-rating">—</div>
             </div>
-            <div class="card">
+            <div class="card" data-testid="kpi-sentiment-card">
                 <div class="card-label">Sentiment Score</div>
                 <div class="card-value" id="kpi-sentiment">—</div>
             </div>
-            <div class="card">
+            <div class="card" data-testid="kpi-sources-card">
                 <div class="card-label">Active Sources</div>
-                <div class="card-value" id="kpi-sources">—</div>
+                <div class="card-value" id="kpi-sources" data-testid="kpi-sources">—</div>
             </div>
         </section>
 
@@ -42,28 +42,28 @@
         <section class="charts-row">
             <div class="chart-container">
                 <h2>Sentiment Distribution</h2>
-                <canvas id="sentimentDoughnut"></canvas>
+                <canvas id="sentimentDoughnut" data-testid="chart-sentiment-doughnut"></canvas>
             </div>
             <div class="chart-container wide">
                 <h2>Sentiment Trend</h2>
-                <canvas id="sentimentTrend"></canvas>
+                <canvas id="sentimentTrend" data-testid="chart-sentiment-trend"></canvas>
             </div>
         </section>
 
         <!-- Top Complaints -->
         <section class="section">
             <h2>Top Complaints</h2>
-            <table id="complaints-table">
+            <table id="complaints-table" data-testid="complaints-table">
                 <thead>
                     <tr>
-                        <th>Theme</th>
-                        <th>Frequency</th>
-                        <th>Severity</th>
-                        <th>Category</th>
-                        <th>Example</th>
+                        <th data-testid="complaints-header-theme">Theme</th>
+                        <th data-testid="complaints-header-frequency">Frequency</th>
+                        <th data-testid="complaints-header-severity">Severity</th>
+                        <th data-testid="complaints-header-category">Category</th>
+                        <th data-testid="complaints-header-example">Example</th>
                     </tr>
                 </thead>
-                <tbody id="complaints-body"></tbody>
+                <tbody id="complaints-body" data-testid="complaints-body"></tbody>
             </table>
         </section>
 
@@ -89,14 +89,14 @@
         <section class="section">
             <h2>Source Breakdown</h2>
             <div class="chart-container">
-                <canvas id="sourceChart"></canvas>
+                <canvas id="sourceChart" data-testid="chart-source"></canvas>
             </div>
         </section>
 
         <!-- AI Insights -->
-        <section class="section" id="insights-section">
+        <section class="section" id="insights-section" data-testid="insights-section">
             <h2>AI Insights & Recommendations</h2>
-            <div id="insights-content" class="insights-panel">
+            <div id="insights-content" data-testid="insights-content" class="insights-panel">
                 <p class="placeholder">Run analysis to generate insights...</p>
             </div>
         </section>
@@ -104,7 +104,7 @@
         <!-- Recent Reviews -->
         <section class="section">
             <h2>Recent Reviews</h2>
-            <div id="reviews-feed" class="reviews-feed"></div>
+            <div id="reviews-feed" data-testid="reviews-feed" class="reviews-feed"></div>
             <button id="btn-load-more" onclick="loadMoreReviews()" style="display:none">Load More</button>
         </section>
     </main>
