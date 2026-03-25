@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 @register("trustpilot")
 class TrustpilotScraper(BaseScraper):
-    """Scrapes Trustpilot review pages for any VidaXL regional profile."""
+    """Scrapes Trustpilot review pages for any Hunkemoller regional profile."""
 
     MAX_PAGES = 50  # safety limit
 

@@ -14,7 +14,7 @@ from src.config import settings
 
 logging.basicConfig(level=getattr(logging, settings.LOG_LEVEL), format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
-app = FastAPI(title="VidaXL Digital Footprint", version="0.1.0")
+app = FastAPI(title="Hunkemoller Digital Footprint", version="0.1.0")
 
 app.include_router(scraper_router)
 app.include_router(reviews_router)
@@ -36,7 +36,7 @@ async def serve_dashboard():
 @app.get("/")
 async def root():
     return {
-        "app": "VidaXL Digital Footprint",
+        "app": "Hunkemoller Digital Footprint",
         "version": "0.1.0",
         "dashboard": "/dashboard",
         "docs": "/docs",

@@ -15,7 +15,7 @@ class TestRootAndHealth:
         resp = api_context.get("/")
         assert resp.ok
         body = resp.json()
-        assert body["app"] == "VidaXL Digital Footprint"
+        assert body["app"] == "Hunkemoller Digital Footprint"
         assert "version" in body
         assert "mock_mode" in body
 

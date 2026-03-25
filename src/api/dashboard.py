@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
 from src.models import Review, Source, AnalysisResult, AnalysisRun
+from src.config import settings
 from src.services.analysis_service import get_analysis_results
 from src.services.review_service import get_review_stats
 
@@ -49,9 +50,20 @@ async def products(db: AsyncSession = Depends(get_db)):
         .order_by(func.avg(Review.rating).asc())
         .limit(10)
     )
+    best_rows = best.all()
+    worst_rows = worst.all()
+
+    if best_rows or worst_rows:
+        return {
+            "best": [{"product": r[0], "avg_rating": round(float(r[1]), 2), "review_count": r[2]} for r in best_rows],
+            "worst": [{"product": r[0], "avg_rating": round(float(r[1]), 2), "review_count": r[2]} for r in worst_rows],
+        }
+
+    # Fallback mock data when no product-level reviews exist
+    from src.analysis.mock import mock_best_products, mock_worst_products
     return {
-        "best": [{"product": r[0], "avg_rating": round(float(r[1]), 2), "review_count": r[2]} for r in best.all()],
-        "worst": [{"product": r[0], "avg_rating": round(float(r[1]), 2), "review_count": r[2]} for r in worst.all()],
+        "best": mock_best_products(),
+        "worst": mock_worst_products(),
     }
 
 
