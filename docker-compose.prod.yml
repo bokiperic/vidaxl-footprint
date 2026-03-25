@@ -22,7 +22,7 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       USE_BEDROCK: ${USE_BEDROCK:-true}
       AWS_REGION: ${AWS_REGION:-eu-central-1}
-      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-eu.anthropic.claude-3-haiku-20240307-v1:0}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-eu.anthropic.claude-haiku-4-5-20251001-v1:0}
       APP_ENV: production
       API_KEY: ${API_KEY}
       AUTH_USERNAME: ${AUTH_USERNAME:-levi9Hunkemoller}

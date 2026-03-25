@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     USE_BEDROCK: bool = False
     AWS_REGION: str = "eu-central-1"
-    BEDROCK_MODEL_ID: str = "eu.anthropic.claude-3-haiku-20240307-v1:0"
+    BEDROCK_MODEL_ID: str = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
     API_KEY: str = ""
     AUTH_USERNAME: str = ""
     AUTH_PASSWORD: str = ""

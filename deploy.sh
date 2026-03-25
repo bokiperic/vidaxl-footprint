@@ -89,7 +89,10 @@ if ! aws iam get-role --role-name "$ROLE_NAME" &>/dev/null; then
                     "bedrock:InvokeModel",
                     "bedrock:InvokeModelWithResponseStream"
                 ],
-                "Resource": "arn:aws:bedrock:*::foundation-model/*"
+                "Resource": [
+                    "arn:aws:bedrock:*::foundation-model/*",
+                    "arn:aws:bedrock:*:*:inference-profile/*"
+                ]
             }]
         }'
     echo "==> IAM role created"
@@ -146,11 +149,16 @@ dnf install -y docker git
 systemctl enable docker
 systemctl start docker
 
-# Install Docker Compose plugin
+# Install Docker Compose plugin + Buildx
 mkdir -p /usr/local/lib/docker/cli-plugins
 curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64" \\
     -o /usr/local/lib/docker/cli-plugins/docker-compose
 chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+BUILDX_VERSION=\$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+curl -SL "https://github.com/docker/buildx/releases/download/\${BUILDX_VERSION}/buildx-\${BUILDX_VERSION}.linux-amd64" \\
+    -o /usr/local/lib/docker/cli-plugins/docker-buildx
+chmod +x /usr/local/lib/docker/cli-plugins/docker-buildx
 
 # Clone repo
 cd /opt
@@ -161,7 +169,7 @@ cd app
 cat > .env <<ENVEOF
 USE_BEDROCK=true
 AWS_REGION=eu-central-1
-BEDROCK_MODEL_ID=eu.anthropic.claude-3-haiku-20240307-v1:0
+BEDROCK_MODEL_ID=eu.anthropic.claude-haiku-4-5-20251001-v1:0
 ANTHROPIC_API_KEY=
 APP_ENV=production
 POSTGRES_USER=vidaxl
