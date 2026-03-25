@@ -57,6 +57,10 @@ class LoginRequiredMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
 
+        # Skip auth entirely if credentials are not configured
+        if not settings.AUTH_USERNAME or not settings.AUTH_PASSWORD:
+            return await call_next(request)
+
         # Allow public paths
         if path in _PUBLIC_PATHS:
             return await call_next(request)

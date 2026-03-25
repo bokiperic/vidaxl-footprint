@@ -10,9 +10,9 @@ class Settings(BaseSettings):
     AWS_REGION: str = "eu-central-1"
     BEDROCK_MODEL_ID: str = "eu.anthropic.claude-3-haiku-20240307-v1:0"
     API_KEY: str = ""
-    AUTH_USERNAME: str = "levi9Hunkemoller"
-    AUTH_PASSWORD: str = "Hunk3moll3r!"
-    AUTH_SECRET: str = "change-me-in-production"
+    AUTH_USERNAME: str = ""
+    AUTH_PASSWORD: str = ""
+    AUTH_SECRET: str = ""
 
     @property
     def use_mock_analysis(self) -> bool:
