@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // ---- API helpers ----
 async function api(path) {
     const res = await fetch(API + path);
+    if (res.status === 401) { window.location.href = '/login'; return; }
     if (!res.ok) throw new Error(`API error: ${res.status}`);
     return res.json();
 }
@@ -142,7 +143,7 @@ async function loadComplaints() {
             tr.innerHTML = `
                 <td><strong>${esc(c.theme)}</strong></td>
                 <td>${c.frequency}</td>
-                <td><span class="severity-${c.severity}">${c.severity}</span></td>
+                <td><span class="severity-${esc(c.severity)}">${esc(c.severity)}</span></td>
                 <td>${esc(c.category || '')}</td>
                 <td><em>"${esc(c.example_quote || '')}"</em></td>
             `;
@@ -231,7 +232,7 @@ async function loadInsights() {
             html += '<h3 style="margin-bottom:0.5rem">Detected Trends</h3>';
             for (const t of data.trends.trends) {
                 const arrow = t.direction === 'up' ? '&#x2191;' : t.direction === 'down' ? '&#x2193;' : '&#x2192;';
-                const cls = `trend-arrow-${t.direction}`;
+                const cls = `trend-arrow-${esc(t.direction)}`;
                 html += `<div class="trend-item"><span class="${cls}" style="font-size:1.2rem">${arrow}</span><strong>${esc(t.trend)}</strong><span style="color:var(--text-muted);margin-left:0.5rem">${esc(t.evidence)}</span></div>`;
             }
             html += '<br>';
@@ -242,7 +243,7 @@ async function loadInsights() {
             html += '<h3 style="margin-bottom:0.5rem">Recommendations</h3>';
             for (const r of data.insights.recommendations) {
                 const color = r.priority === 'high' ? 'var(--negative)' : r.priority === 'medium' ? 'var(--neutral)' : 'var(--positive)';
-                html += `<div class="recommendation priority-${r.priority}">
+                html += `<div class="recommendation priority-${esc(r.priority)}">
                     <span class="priority-badge" style="background:${color}">${r.priority}</span>
                     <strong>${esc(r.recommendation)}</strong>
                     <div style="color:var(--text-muted);margin-top:0.25rem;font-size:0.8rem">Expected impact: ${esc(r.expected_impact)}</div>
@@ -268,7 +269,7 @@ async function loadReviews() {
             div.setAttribute('data-testid', 'review-item');
 
             const stars = r.rating ? '★'.repeat(Math.round(r.rating)) + '☆'.repeat(5 - Math.round(r.rating)) : '';
-            const sentBadge = r.sentiment ? `<span class="sentiment-badge sentiment-${r.sentiment}">${r.sentiment}</span>` : '';
+            const sentBadge = r.sentiment ? `<span class="sentiment-badge sentiment-${esc(r.sentiment)}">${esc(r.sentiment)}</span>` : '';
             const topics = (r.topics || []).map(t => `<span class="topic-tag">${esc(t)}</span>`).join('');
 
             div.innerHTML = `

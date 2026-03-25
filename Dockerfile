@@ -14,6 +14,4 @@ COPY alembic/ alembic/
 COPY src/ src/
 COPY dashboard/ dashboard/
 
-RUN playwright install --with-deps chromium || true
-
 CMD ["sh", "-c", "alembic upgrade head && uvicorn src.main:app --host 0.0.0.0 --port 8000"]

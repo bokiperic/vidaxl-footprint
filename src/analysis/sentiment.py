@@ -3,10 +3,8 @@ from __future__ import annotations
 import json
 import logging
 
-import anthropic
-
+from src.analysis.llm_client import get_llm_client, get_model_id
 from src.analysis.prompts import SENTIMENT_BATCH_PROMPT
-from src.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +17,7 @@ async def classify_sentiment_batch(reviews: list[dict]) -> list[dict]:
     Each review dict should have: id, title, body, rating
     Returns list of: {id, sentiment, sentiment_score, topics}
     """
-    client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+    client = get_llm_client()
 
     results = []
     for i in range(0, len(reviews), BATCH_SIZE):
@@ -33,7 +31,7 @@ async def classify_sentiment_batch(reviews: list[dict]) -> list[dict]:
 
         try:
             message = await client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model=get_model_id("claude-sonnet-4-20250514"),
                 max_tokens=4096,
                 messages=[{"role": "user", "content": prompt}],
             )

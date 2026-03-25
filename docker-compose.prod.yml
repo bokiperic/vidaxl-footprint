@@ -3,14 +3,12 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-vidaxl}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vidaxl}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB:-vidaxl_footprint}
-    ports:
-      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vidaxl -d vidaxl_footprint"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vidaxl} -d ${POSTGRES_DB:-vidaxl_footprint}"]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -20,19 +18,19 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vidaxl}:${POSTGRES_PASSWORD:-vidaxl}@db:5432/${POSTGRES_DB:-vidaxl_footprint}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-vidaxl}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-vidaxl_footprint}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
-      USE_BEDROCK: ${USE_BEDROCK:-false}
+      USE_BEDROCK: ${USE_BEDROCK:-true}
       AWS_REGION: ${AWS_REGION:-eu-central-1}
       BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-eu.anthropic.claude-3-haiku-20240307-v1:0}
+      APP_ENV: production
+      API_KEY: ${API_KEY}
+      AUTH_USERNAME: ${AUTH_USERNAME:-levi9Hunkemoller}
+      AUTH_PASSWORD: ${AUTH_PASSWORD:-Hunk3moll3r!}
+      AUTH_SECRET: ${AUTH_SECRET}
     depends_on:
       db:
         condition: service_healthy
-    volumes:
-      - ./src:/app/src
-      - ./dashboard:/app/dashboard
-      - ./alembic:/app/alembic
-      - ./alembic.ini:/app/alembic.ini
 
 volumes:
   pgdata:

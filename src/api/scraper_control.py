@@ -9,9 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_db, async_session
 from src.models import ScrapeRun, Source
 from src.schemas.common import ScrapeRequest, ScrapeRunOut
+from src.security import require_api_key
 from src.services.scraper_service import get_active_sources, run_scraper_for_source
 
-router = APIRouter(prefix="/api/v1/scrape", tags=["scraper"])
+router = APIRouter(prefix="/api/v1/scrape", tags=["scraper"], dependencies=[Depends(require_api_key)])
 logger = logging.getLogger(__name__)
 
 

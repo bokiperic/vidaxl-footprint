@@ -4,8 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db, async_session
 from src.analysis.pipeline import run_analysis_pipeline
+from src.security import require_api_key
 
-router = APIRouter(prefix="/api/v1/analysis", tags=["analysis"])
+router = APIRouter(prefix="/api/v1/analysis", tags=["analysis"], dependencies=[Depends(require_api_key)])
 
 
 async def _run_analysis():

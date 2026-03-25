@@ -12,7 +12,7 @@ router = APIRouter(prefix="/api/v1/articles", tags=["articles"])
 
 @router.get("")
 async def list_articles(
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1, le=10000),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
 ):

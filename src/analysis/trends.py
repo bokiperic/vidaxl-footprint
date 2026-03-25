@@ -3,10 +3,8 @@ from __future__ import annotations
 import json
 import logging
 
-import anthropic
-
+from src.analysis.llm_client import get_llm_client, get_model_id
 from src.analysis.prompts import TREND_DETECTION_PROMPT
-from src.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +17,7 @@ async def detect_trends(
     sources: list[str],
 ) -> dict:
     """Use Claude to detect trends and generate business insights."""
-    client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+    client = get_llm_client()
 
     prompt = TREND_DETECTION_PROMPT.format(
         monthly_data=json.dumps(monthly_data, indent=2),
@@ -31,7 +29,7 @@ async def detect_trends(
 
     try:
         message = await client.messages.create(
-            model="claude-opus-4-20250514",
+            model=get_model_id("claude-opus-4-20250514"),
             max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],
         )
