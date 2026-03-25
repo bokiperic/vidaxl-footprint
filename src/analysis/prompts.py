@@ -3,7 +3,7 @@ SENTIMENT_BATCH_PROMPT = """Analyze the following customer reviews and for each 
 2. sentiment_score: float 0.0 (most negative) to 1.0 (most positive)
 3. topics: list of 1-5 topic tags (e.g. "delivery delay", "missing parts", "good quality", "poor packaging")
 
-Return a JSON array where each element has: {"id": <review_id>, "sentiment": "...", "sentiment_score": ..., "topics": [...]}
+Return a JSON array where each element has: {{"id": <review_id>, "sentiment": "...", "sentiment_score": ..., "topics": [...]}}
 
 Reviews:
 {reviews_json}
