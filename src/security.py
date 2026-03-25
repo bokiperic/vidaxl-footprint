@@ -35,10 +35,19 @@ def _verify_token(token: str) -> bool:
 _api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 
-async def require_api_key(api_key: str | None = Security(_api_key_header)):
-    """Dependency that enforces API key auth in production."""
+async def require_api_key(request: Request, api_key: str | None = Security(_api_key_header)):
+    """Dependency that enforces API key auth in production.
+
+    Allows through if the user has a valid session cookie (logged in via browser)
+    or a valid X-API-Key header (programmatic access).
+    """
     if not settings.is_production:
         return
+    # Allow logged-in browser users
+    token = request.cookies.get(_SESSION_COOKIE)
+    if token and _verify_token(token):
+        return
+    # Check API key for programmatic access
     if not settings.API_KEY:
         return
     if api_key != settings.API_KEY:
