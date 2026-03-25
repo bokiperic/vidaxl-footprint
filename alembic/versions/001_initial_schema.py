@@ -99,22 +99,16 @@ def upgrade() -> None:
     # Seed default sources
     op.execute("""
         INSERT INTO sources (name, source_type, base_url, region, scraper_key) VALUES
-        ('Trustpilot UK', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.co.uk', 'GB', 'trustpilot'),
-        ('Trustpilot DE', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.de', 'DE', 'trustpilot'),
-        ('Trustpilot NL', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.nl', 'NL', 'trustpilot'),
-        ('Trustpilot DK', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.dk', 'DK', 'trustpilot'),
-        ('Trustpilot NO', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.no', 'NO', 'trustpilot'),
-        ('Trustpilot ES', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.es', 'ES', 'trustpilot'),
-        ('Trustpilot FR', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.fr', 'FR', 'trustpilot'),
-        ('Trustpilot IE', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.ie', 'IE', 'trustpilot'),
-        ('Trustpilot AU', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.com.au', 'AU', 'trustpilot'),
-        ('Trustpilot COM', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.com', NULL, 'trustpilot'),
-        ('Trustpilot IT', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.it', 'IT', 'trustpilot'),
-        ('Trustpilot SE', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.se', 'SE', 'trustpilot'),
-        ('Trustpilot FI', 'review_platform', 'https://www.trustpilot.com/review/vidaxl.fi', 'FI', 'trustpilot'),
-        ('Reviews.io', 'review_platform', 'https://www.reviews.io/company-reviews/store/vidaxl.co.uk', 'GB', 'reviewsio'),
-        ('PissedConsumer', 'review_platform', 'https://www.pissedconsumer.com/vidaxl.html', NULL, 'pissedconsumer'),
-        ('VidaXL Blog', 'news', 'https://corporate.vidaxl.com/blog', NULL, 'news_generic')
+        ('Trustpilot COM', 'review_platform', 'https://www.trustpilot.com/review/www.hunkemoller.com', NULL, 'trustpilot'),
+        ('Trustpilot NL', 'review_platform', 'https://www.trustpilot.com/review/www.hunkemoller.nl', 'NL', 'trustpilot'),
+        ('Trustpilot DE', 'review_platform', 'https://www.trustpilot.com/review/hunkemoller.de', 'DE', 'trustpilot'),
+        ('Trustpilot DK', 'review_platform', 'https://www.trustpilot.com/review/hunkemoller.dk', 'DK', 'trustpilot'),
+        ('Trustpilot SE', 'review_platform', 'https://www.trustpilot.com/review/www.hunkemoller.se', 'SE', 'trustpilot'),
+        ('Trustpilot BE', 'review_platform', 'https://www.trustpilot.com/review/hunkemoller.be', 'BE', 'trustpilot'),
+        ('Trustpilot UK', 'review_platform', 'https://www.trustpilot.com/review/hunkemoller.co.uk', 'GB', 'trustpilot'),
+        ('Reviews.io', 'review_platform', 'https://www.reviews.io/company-reviews/store/hunkemoller', NULL, 'reviewsio'),
+        ('PissedConsumer', 'review_platform', 'https://www.pissedconsumer.com/hunkemoller.html', NULL, 'pissedconsumer'),
+        ('Hunkemoller News', 'news', 'https://www.hunkemoller.com/corporate', NULL, 'news_generic')
     """)
 
 

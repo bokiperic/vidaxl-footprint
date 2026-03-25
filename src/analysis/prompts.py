@@ -10,7 +10,7 @@ Reviews:
 
 Return ONLY the JSON array, no other text."""
 
-THEME_AGGREGATION_PROMPT = """Given these topic tags extracted from {total_reviews} customer reviews of VidaXL (online home & garden retailer), merge synonymous topics and rank the top 10 complaint themes.
+THEME_AGGREGATION_PROMPT = """Given these topic tags extracted from {total_reviews} customer reviews of Hunkemoller (European lingerie & underwear retailer), merge synonymous topics and rank the top 10 complaint themes.
 
 Topic frequencies:
 {topic_frequencies}
@@ -24,7 +24,7 @@ For each theme provide:
 
 Return a JSON array of the top 10 themes, sorted by frequency descending. Return ONLY the JSON array."""
 
-TREND_DETECTION_PROMPT = """Analyze the following monthly sentiment and topic data from VidaXL customer reviews to detect trends and generate actionable business insights.
+TREND_DETECTION_PROMPT = """Analyze the following monthly sentiment and topic data from Hunkemoller customer reviews to detect trends and generate actionable business insights.
 
 Monthly data:
 {monthly_data}
@@ -44,7 +44,7 @@ Provide:
 
 Return as a JSON object with these 4 keys. Return ONLY JSON."""
 
-ARTICLE_SUMMARY_PROMPT = """Summarize this article about VidaXL. Extract:
+ARTICLE_SUMMARY_PROMPT = """Summarize this article about Hunkemoller. Extract:
 - summary: 2-3 sentence summary
 - sentiment: "POS", "NEU", or "NEG"
 - key_topics: list of topic tags

@@ -3,9 +3,9 @@ from __future__ import annotations
 import random
 
 COMMON_TOPICS = [
-    "delivery delay", "missing parts", "damaged goods", "poor packaging",
-    "wrong item", "slow customer service", "refund issues", "quality issues",
-    "assembly difficulty", "good value", "fast shipping", "great product",
+    "sizing issues", "fabric quality", "bra fit", "delivery delay",
+    "wrong size", "slow customer service", "refund issues", "comfort",
+    "color mismatch", "good value", "fast shipping", "great design",
     "poor communication", "website issues", "return process",
 ]
 
@@ -41,37 +41,67 @@ def mock_sentiment(text: str | None) -> tuple[str, float, list[str]]:
 
 def mock_top_complaints() -> list[dict]:
     return [
-        {"theme": "Delivery Delays", "frequency": 342, "severity": "high", "example_quote": "Waited 3 weeks for delivery, no updates provided.", "category": "delivery"},
-        {"theme": "Damaged/Broken Items", "frequency": 287, "severity": "high", "example_quote": "Product arrived with broken legs, completely unusable.", "category": "product_quality"},
-        {"theme": "Missing Parts", "frequency": 198, "severity": "high", "example_quote": "Half the screws were missing from the package.", "category": "product_quality"},
-        {"theme": "Poor Customer Service", "frequency": 176, "severity": "medium", "example_quote": "Waited on hold for 45 minutes, then got disconnected.", "category": "customer_service"},
-        {"theme": "Refund Difficulties", "frequency": 154, "severity": "medium", "example_quote": "Still waiting for my refund after 6 weeks.", "category": "returns"},
-        {"theme": "Wrong Item Sent", "frequency": 98, "severity": "medium", "example_quote": "Ordered a desk, received a completely different table.", "category": "delivery"},
-        {"theme": "Poor Packaging", "frequency": 87, "severity": "medium", "example_quote": "Box was completely crushed, no padding inside.", "category": "delivery"},
-        {"theme": "Assembly Instructions", "frequency": 76, "severity": "low", "example_quote": "Instructions were in a language I couldn't read.", "category": "product_quality"},
-        {"theme": "Website/Ordering Issues", "frequency": 65, "severity": "low", "example_quote": "Website showed item in stock but order was cancelled.", "category": "website"},
-        {"theme": "Product Not As Described", "frequency": 54, "severity": "medium", "example_quote": "Color was completely different from the photos.", "category": "product_quality"},
+        {"theme": "Sizing Inconsistency", "frequency": 342, "severity": "high", "example_quote": "Ordered my usual size but it was way too small, sizing is all over the place.", "category": "product_quality"},
+        {"theme": "Fabric Quality Decline", "frequency": 287, "severity": "high", "example_quote": "Material feels cheap and started pilling after one wash.", "category": "product_quality"},
+        {"theme": "Bra Fit Issues", "frequency": 198, "severity": "high", "example_quote": "The bra cups are shaped oddly and don't provide proper support.", "category": "product_quality"},
+        {"theme": "Delivery Delays", "frequency": 176, "severity": "medium", "example_quote": "Waited 2 weeks for delivery, no tracking updates provided.", "category": "delivery"},
+        {"theme": "Refund Difficulties", "frequency": 154, "severity": "medium", "example_quote": "Still waiting for my refund after 4 weeks of returning items.", "category": "returns"},
+        {"theme": "Poor Customer Service", "frequency": 132, "severity": "medium", "example_quote": "Email support took 10 days to respond with a generic reply.", "category": "customer_service"},
+        {"theme": "Return Process Complexity", "frequency": 98, "severity": "medium", "example_quote": "Return shipping costs are too high and the process is confusing.", "category": "returns"},
+        {"theme": "Color Mismatch", "frequency": 87, "severity": "low", "example_quote": "The color looked completely different from the website photos.", "category": "product_quality"},
+        {"theme": "Website/Ordering Issues", "frequency": 65, "severity": "low", "example_quote": "Website showed item in stock but order was cancelled next day.", "category": "website"},
+        {"theme": "Comfort Issues", "frequency": 54, "severity": "medium", "example_quote": "The underwire digs in after just an hour of wearing.", "category": "product_quality"},
     ]
 
 
 def mock_trends() -> dict:
     return {
         "trends": [
-            {"trend": "Delivery complaints increasing", "direction": "up", "evidence": "20% increase in delivery-related reviews over last 3 months"},
-            {"trend": "Product quality sentiment improving", "direction": "up", "evidence": "Fewer reports of damaged goods in recent reviews"},
-            {"trend": "Customer service response time", "direction": "stable", "evidence": "Consistent complaints about wait times"},
-            {"trend": "Return process satisfaction", "direction": "down", "evidence": "Growing number of refund delay complaints"},
+            {"trend": "Sizing complaints increasing", "direction": "up", "evidence": "25% increase in sizing-related reviews over last 3 months"},
+            {"trend": "Fabric quality sentiment declining", "direction": "down", "evidence": "More reports of poor material quality in recent collections"},
+            {"trend": "Customer service response time", "direction": "stable", "evidence": "Consistent complaints about slow email support"},
+            {"trend": "Return process satisfaction", "direction": "down", "evidence": "Growing number of complaints about return shipping costs"},
         ],
-        "seasonal_patterns": "Spike in negative reviews after major sale events (Black Friday, summer sales) likely due to fulfillment strain.",
-        "source_specific": "Trustpilot DE and NL show higher satisfaction than UK profiles. PissedConsumer skews heavily negative by platform nature.",
+        "seasonal_patterns": "Spike in negative reviews after major sale events (Black Friday, summer sales) likely due to fulfillment strain and sizing issues with sale items.",
+        "source_specific": "Trustpilot DE and NL show higher satisfaction than COM profile. PissedConsumer skews heavily negative by platform nature.",
         "recommendations": [
-            {"priority": "high", "recommendation": "Implement proactive delivery tracking notifications to reduce 'where is my order' complaints", "expected_impact": "Could reduce delivery complaints by 30-40%"},
-            {"priority": "high", "recommendation": "Improve packaging standards for fragile items — add quality checks before dispatch", "expected_impact": "Reduce damaged goods reports by 25%"},
-            {"priority": "medium", "recommendation": "Create video assembly guides for top 50 products to supplement written instructions", "expected_impact": "Reduce assembly complaints and improve product satisfaction"},
-            {"priority": "medium", "recommendation": "Streamline refund process with automated status updates at each stage", "expected_impact": "Improve customer retention and reduce repeat contacts"},
-            {"priority": "low", "recommendation": "Add a real-time inventory system to prevent overselling during peak periods", "expected_impact": "Eliminate 'order cancelled' complaints related to stock issues"},
+            {"priority": "high", "recommendation": "Standardize sizing across all product lines and add detailed size guides with measurements", "expected_impact": "Could reduce sizing complaints by 30-40%"},
+            {"priority": "high", "recommendation": "Improve fabric quality control — enforce minimum material standards for all collections", "expected_impact": "Reduce quality complaints by 25%"},
+            {"priority": "medium", "recommendation": "Offer free returns or prepaid return labels to reduce friction in the return process", "expected_impact": "Improve customer retention and reduce negative reviews about returns"},
+            {"priority": "medium", "recommendation": "Streamline refund process with automated status updates at each stage", "expected_impact": "Improve customer satisfaction and reduce repeat contacts"},
+            {"priority": "low", "recommendation": "Add virtual try-on or fit recommendation tool to reduce sizing mismatches", "expected_impact": "Reduce return rates and improve purchase confidence"},
         ],
     }
+
+
+def mock_best_products() -> list[dict]:
+    return [
+        {"product": "Luxe Lace Padded Bra", "avg_rating": 4.8, "review_count": 47},
+        {"product": "Cotton Comfort Brief 3-Pack", "avg_rating": 4.7, "review_count": 63},
+        {"product": "Silk Touch Nightdress", "avg_rating": 4.6, "review_count": 29},
+        {"product": "Sport Seamless Leggings", "avg_rating": 4.6, "review_count": 38},
+        {"product": "Modal Soft Pyjama Set", "avg_rating": 4.5, "review_count": 41},
+        {"product": "Invisible T-Shirt Bra", "avg_rating": 4.5, "review_count": 55},
+        {"product": "Ribbed Cotton Hipster", "avg_rating": 4.4, "review_count": 34},
+        {"product": "Satin Kimono Robe", "avg_rating": 4.4, "review_count": 22},
+        {"product": "Micro Mesh Thong 5-Pack", "avg_rating": 4.3, "review_count": 48},
+        {"product": "Cozy Fleece Lounge Hoodie", "avg_rating": 4.3, "review_count": 31},
+    ]
+
+
+def mock_worst_products() -> list[dict]:
+    return [
+        {"product": "Strapless Push-Up Bra", "avg_rating": 2.1, "review_count": 36},
+        {"product": "Shapewear High-Waist Brief", "avg_rating": 2.3, "review_count": 28},
+        {"product": "Adhesive Nipple Covers", "avg_rating": 2.4, "review_count": 19},
+        {"product": "Backless Body Suit", "avg_rating": 2.5, "review_count": 23},
+        {"product": "Lace Suspender Belt", "avg_rating": 2.6, "review_count": 15},
+        {"product": "Underwire Plunge Bra", "avg_rating": 2.7, "review_count": 42},
+        {"product": "String Bikini Bottom", "avg_rating": 2.8, "review_count": 21},
+        {"product": "Halterneck Swimsuit", "avg_rating": 2.9, "review_count": 17},
+        {"product": "Corset Waist Trainer", "avg_rating": 3.0, "review_count": 26},
+        {"product": "Lace-Up Bodysuit", "avg_rating": 3.0, "review_count": 20},
+    ]
 
 
 def mock_monthly_sentiment() -> list[dict]:

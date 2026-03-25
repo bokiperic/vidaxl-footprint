@@ -15,12 +15,12 @@ def dashboard(page: Page, base_url: str) -> Page:
 
 class TestDashboardLoads:
     def test_page_title(self, dashboard: Page):
-        expect(dashboard).to_have_title("VidaXL Digital Footprint")
+        expect(dashboard).to_have_title("Hunkemoller Digital Footprint")
 
     def test_header_visible(self, dashboard: Page):
         header = dashboard.get_by_test_id("header-title")
         expect(header).to_be_visible()
-        expect(header).to_have_text("VidaXL Digital Footprint")
+        expect(header).to_have_text("Hunkemoller Digital Footprint")
 
     def test_action_buttons_visible(self, dashboard: Page):
         expect(dashboard.get_by_test_id("btn-scrape")).to_be_visible()
