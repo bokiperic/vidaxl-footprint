@@ -4,7 +4,7 @@ import datetime
 import logging
 from collections import Counter
 
-from sqlalchemy import String, func, select, type_coerce
+from sqlalchemy import String, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
@@ -138,7 +138,7 @@ async def _enrich_complaints_with_sources(db: AsyncSession, complaints: list[dic
                 select(Review)
                 .options(selectinload(Review.source))
                 .where(Review.topics.isnot(None))
-                .where(type_coerce(Review.topics, String).ilike(f"%{word}%"))
+                .where(cast(Review.topics, String).ilike(f"%{word}%"))
                 .limit(1)
             )
             review = result.scalars().first()

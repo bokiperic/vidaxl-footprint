@@ -34,7 +34,7 @@ async def complaints(db: AsyncSession = Depends(get_db)):
     # Enrich complaints missing source info by finding a matching review
     needs_enrichment = [c for c in complaint_list if not c.get("source_url")]
     if needs_enrichment:
-        from sqlalchemy import String, type_coerce
+        from sqlalchemy import cast, String
         from sqlalchemy.orm import selectinload
         for c in needs_enrichment:
             theme_words = c.get("theme", "").lower().split()
@@ -45,7 +45,7 @@ async def complaints(db: AsyncSession = Depends(get_db)):
                     select(Review)
                     .options(selectinload(Review.source))
                     .where(Review.topics.isnot(None))
-                    .where(type_coerce(Review.topics, String).ilike(f"%{word}%"))
+                    .where(cast(Review.topics, String).ilike(f"%{word}%"))
                     .limit(1)
                 )
                 review = result.scalars().first()
