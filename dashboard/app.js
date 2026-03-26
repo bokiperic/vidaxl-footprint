@@ -303,9 +303,14 @@ async function loadReviews() {
     }
 }
 
-function loadMoreReviews() {
+async function loadMoreReviews() {
+    const btn = document.getElementById('btn-load-more');
+    btn.classList.add('loading');
+    btn.textContent = 'Loading...';
     reviewPage++;
-    loadReviews();
+    await loadReviews();
+    btn.classList.remove('loading');
+    btn.textContent = 'Load More';
 }
 
 // ---- Util ----

@@ -323,6 +323,26 @@ td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
     border: 1px solid var(--accent);
     border-radius: var(--radius);
     cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+#btn-load-more:hover {
+    background: var(--accent);
+    color: #fff;
+}
+
+#btn-load-more:active {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #fff;
+}
+
+#btn-load-more.loading {
+    pointer-events: none;
+    opacity: 0.6;
+    color: var(--text-muted);
+    border-color: var(--border);
+    background: transparent;
 }
 
 @media (max-width: 900px) {
