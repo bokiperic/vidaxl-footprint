@@ -1,6 +1,7 @@
 from __future__ import annotations
 from sqlalchemy import func, select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from src.models import Review, Source
 
@@ -37,7 +38,8 @@ async def get_reviews(
 
     total = await db.scalar(count_q) or 0
     result = await db.execute(
-        q.order_by(Review.review_date.desc().nullslast(), Review.id.desc())
+        q.options(selectinload(Review.source))
+        .order_by(Review.review_date.desc().nullslast(), Review.id.desc())
         .offset((page - 1) * page_size)
         .limit(page_size)
     )

@@ -272,15 +272,21 @@ async function loadReviews() {
             const sentBadge = r.sentiment ? `<span class="sentiment-badge sentiment-${esc(r.sentiment)}">${esc(r.sentiment)}</span>` : '';
             const topics = (r.topics || []).map(t => `<span class="topic-tag">${esc(t)}</span>`).join('');
 
+            const sourceName = r.source_name ? `<span class="review-source">${esc(r.source_name)}</span>` : '';
+            const sourceLink = r.source_url ? `<a href="${esc(r.source_url)}" target="_blank" rel="noopener noreferrer" class="review-source-link">Open source</a>` : '';
+
             div.innerHTML = `
                 <div class="review-header">
                     <span class="review-author" data-testid="review-author">${esc(r.author || 'Anonymous')} ${sentBadge}</span>
                     <span class="review-date">${r.review_date || ''}</span>
                 </div>
-                ${stars ? `<div class="review-rating">${stars}</div>` : ''}
+                ${stars || sourceName ? `<div class="review-meta-row">${stars ? `<span class="review-rating">${stars}</span>` : ''}${sourceName}</div>` : ''}
                 ${r.title ? `<div class="review-title">${esc(r.title)}</div>` : ''}
                 ${r.body ? `<div class="review-body">${esc(r.body?.substring(0, 300))}${(r.body?.length || 0) > 300 ? '...' : ''}</div>` : ''}
-                ${topics ? `<div class="topics-list">${topics}</div>` : ''}
+                <div class="review-footer">
+                    <div class="topics-list">${topics}</div>
+                    ${sourceLink}
+                </div>
             `;
             feed.appendChild(div);
         }

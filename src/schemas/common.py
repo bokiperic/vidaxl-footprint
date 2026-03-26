@@ -28,6 +28,8 @@ class ReviewOut(BaseModel):
     sentiment: str | None
     sentiment_score: float | None
     topics: list | None
+    source_name: str | None = None
+    source_url: str | None = None
     model_config = {"from_attributes": True}
 
 

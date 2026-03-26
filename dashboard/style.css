@@ -180,7 +180,20 @@ td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
 .review-author { font-weight: 500; font-size: 0.85rem; }
 .review-date { font-size: 0.75rem; color: var(--text-muted); }
 
+.review-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
 .review-rating { color: #f59e0b; font-size: 0.85rem; }
+
+.review-source {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
 
 .review-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
 .review-body { font-size: 0.8rem; color: var(--text-muted); }
@@ -207,7 +220,26 @@ td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
 .sentiment-NEU { background: var(--neutral); color: black; }
 .sentiment-NEG { background: var(--negative); color: white; }
 
-.topics-list { margin-top: 0.25rem; }
+.review-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 0.25rem;
+}
+
+.review-source-link {
+    font-size: 0.75rem;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.review-source-link:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
+.topics-list { margin-top: 0; }
 .topic-tag {
     display: inline-block;
     font-size: 0.65rem;

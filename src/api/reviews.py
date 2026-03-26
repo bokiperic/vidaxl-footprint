@@ -21,8 +21,15 @@ async def list_reviews(
     db: AsyncSession = Depends(get_db),
 ):
     reviews, total = await get_reviews(db, page, page_size, source_id, min_rating, max_rating, sentiment, search)
+    items = []
+    for r in reviews:
+        out = ReviewOut.model_validate(r)
+        if r.source:
+            out.source_name = r.source.name
+            out.source_url = r.source.base_url
+        items.append(out)
     return {
-        "items": [ReviewOut.model_validate(r) for r in reviews],
+        "items": items,
         "total": total,
         "page": page,
         "page_size": page_size,
