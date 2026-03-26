@@ -126,8 +126,10 @@ async def trends(db: AsyncSession = Depends(get_db)):
 @router.get("/sources")
 async def sources(db: AsyncSession = Depends(get_db)):
     """Per-source breakdown."""
-    result = await db.execute(
+    # Count reviews per source
+    review_result = await db.execute(
         select(
+            Source.id,
             Source.name,
             Source.region,
             Source.source_type,
@@ -138,21 +140,34 @@ async def sources(db: AsyncSession = Depends(get_db)):
         .outerjoin(Review, Review.source_id == Source.id)
         .where(Source.is_active.is_(True))
         .group_by(Source.id, Source.name, Source.region, Source.source_type)
-        .order_by(func.count(Review.id).desc())
     )
-    return {
-        "sources": [
-            {
-                "name": r[0],
-                "region": r[1],
-                "source_type": r[2],
-                "review_count": r[3],
-                "avg_rating": round(float(r[4]), 2) if r[4] else None,
-                "avg_sentiment": round(float(r[5]), 2) if r[5] else None,
-            }
-            for r in result.all()
-        ]
-    }
+    sources_map = {}
+    for r in review_result.all():
+        sources_map[r[0]] = {
+            "name": r[1],
+            "region": r[2],
+            "source_type": r[3],
+            "review_count": r[4],
+            "article_count": 0,
+            "item_count": r[4],
+            "avg_rating": round(float(r[5]), 2) if r[5] else None,
+            "avg_sentiment": round(float(r[6]), 2) if r[6] else None,
+        }
+
+    # Count articles per source
+    article_result = await db.execute(
+        select(Source.id, func.count(Article.id).label("article_count"))
+        .outerjoin(Article, Article.source_id == Source.id)
+        .where(Source.is_active.is_(True))
+        .group_by(Source.id)
+    )
+    for r in article_result.all():
+        if r[0] in sources_map:
+            sources_map[r[0]]["article_count"] = r[1]
+            sources_map[r[0]]["item_count"] = sources_map[r[0]]["review_count"] + r[1]
+
+    sources_list = sorted(sources_map.values(), key=lambda s: s["item_count"], reverse=True)
+    return {"sources": sources_list}
 
 
 @router.get("/web-mentions")

@@ -189,30 +189,43 @@ async function loadSources() {
     try {
         const data = await api('/api/v1/dashboard/sources');
         const sources = data.sources || [];
-        const withReviews = sources.filter(s => s.review_count > 0);
+        const withItems = sources.filter(s => s.item_count > 0);
 
         const ctx = document.getElementById('sourceChart').getContext('2d');
         if (sourceBarChart) sourceBarChart.destroy();
 
+        const labels = withItems.map(s => {
+            if (s.source_type === 'web_search') return s.name + ' (Web)';
+            return s.name;
+        });
+
         sourceBarChart = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: withReviews.map(s => s.name),
-                datasets: [{
-                    label: 'Review Count',
-                    data: withReviews.map(s => s.review_count),
-                    backgroundColor: '#6366f1',
-                    borderRadius: 4,
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Reviews',
+                        data: withItems.map(s => s.review_count),
+                        backgroundColor: '#6366f1',
+                        borderRadius: 4,
+                    },
+                    {
+                        label: 'Articles',
+                        data: withItems.map(s => s.article_count),
+                        backgroundColor: '#8b5cf6',
+                        borderRadius: 4,
+                    },
+                ]
             },
             options: {
                 indexAxis: 'y',
                 responsive: true,
                 scales: {
-                    x: { ticks: { color: '#8b8d98' }, grid: { color: '#2a2d3a' } },
-                    y: { ticks: { color: '#e4e4e7' }, grid: { display: false } }
+                    x: { stacked: true, ticks: { color: '#8b8d98' }, grid: { color: '#2a2d3a' } },
+                    y: { stacked: true, ticks: { color: '#e4e4e7' }, grid: { display: false } }
                 },
-                plugins: { legend: { display: false } }
+                plugins: { legend: { labels: { color: '#e4e4e7' } } }
             }
         });
     } catch (e) {
