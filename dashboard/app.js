@@ -16,6 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
             popup.classList.add('hidden');
         }
     });
+    // Set max attribute to current month to prevent future selection
+    const maxMonth = currentMonth();
+    document.getElementById('date-start').setAttribute('max', maxMonth);
+    document.getElementById('date-end').setAttribute('max', maxMonth);
+
     // Toggle placeholder visibility on month inputs + click anywhere to open picker
     for (const id of ['date-start', 'date-end']) {
         const input = document.getElementById(id);
@@ -87,6 +92,11 @@ function syncInputVisuals(id, value) {
 function applyDateRange() {
     let start = document.getElementById('date-start').value || null;
     let end = document.getElementById('date-end').value || null;
+
+    // Clamp future dates to current month
+    const max = currentMonth();
+    if (start && start > max) start = max;
+    if (end && end > max) end = max;
 
     // Only "To" selected without "From" → clear both (All Time)
     if (!start && end) {
