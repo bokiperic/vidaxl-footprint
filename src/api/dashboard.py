@@ -1,6 +1,8 @@
 from __future__ import annotations
-from fastapi import APIRouter, Depends
-from sqlalchemy import func, select
+from datetime import date
+from typing import Optional
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
@@ -13,16 +15,24 @@ router = APIRouter(prefix="/api/v1/dashboard", tags=["dashboard"])
 
 
 @router.get("/overview")
-async def overview(db: AsyncSession = Depends(get_db)):
+async def overview(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """KPI cards data."""
-    stats = await get_review_stats(db)
+    stats = await get_review_stats(db, start_date=start_date, end_date=end_date)
     source_count = await db.scalar(select(func.count()).select_from(Source).where(Source.is_active.is_(True))) or 0
     stats["active_sources"] = source_count
     return stats
 
 
 @router.get("/complaints")
-async def complaints(db: AsyncSession = Depends(get_db)):
+async def complaints(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """Top complaints with frequency and quotes."""
     results = await get_analysis_results(db, "top_complaints")
     if not results:
@@ -58,21 +68,35 @@ async def complaints(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/products")
-async def products(db: AsyncSession = Depends(get_db)):
+async def products(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """Best/worst rated products."""
-    # Best products
-    best = await db.execute(
+    best_q = (
         select(Review.product_name, func.avg(Review.rating).label("avg_rating"), func.count().label("count"))
         .where(Review.product_name.isnot(None), Review.rating.isnot(None))
-        .group_by(Review.product_name)
+    )
+    worst_q = (
+        select(Review.product_name, func.avg(Review.rating).label("avg_rating"), func.count().label("count"))
+        .where(Review.product_name.isnot(None), Review.rating.isnot(None))
+    )
+    if start_date:
+        best_q = best_q.where(Review.review_date >= start_date)
+        worst_q = worst_q.where(Review.review_date >= start_date)
+    if end_date:
+        best_q = best_q.where(Review.review_date <= end_date)
+        worst_q = worst_q.where(Review.review_date <= end_date)
+
+    best = await db.execute(
+        best_q.group_by(Review.product_name)
         .having(func.count() >= 2)
         .order_by(func.avg(Review.rating).desc())
         .limit(10)
     )
     worst = await db.execute(
-        select(Review.product_name, func.avg(Review.rating).label("avg_rating"), func.count().label("count"))
-        .where(Review.product_name.isnot(None), Review.rating.isnot(None))
-        .group_by(Review.product_name)
+        worst_q.group_by(Review.product_name)
         .having(func.count() >= 2)
         .order_by(func.avg(Review.rating).asc())
         .limit(10)
@@ -95,23 +119,34 @@ async def products(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/trends")
-async def trends(db: AsyncSession = Depends(get_db)):
+async def trends(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """Time-series sentiment data for charts."""
-    results = await get_analysis_results(db, "sentiment_summary")
-    if results:
-        return results[0].data
+    # If no date filter, try pre-computed analysis first
+    if not start_date and not end_date:
+        results = await get_analysis_results(db, "sentiment_summary")
+        if results:
+            return results[0].data
 
-    # Fallback: compute from DB
-    result = await db.execute(
+    # Compute from DB (with optional date filtering)
+    q = (
         select(
             func.date_trunc("month", Review.review_date).label("month"),
             Review.sentiment,
             func.count().label("cnt"),
         )
         .where(Review.review_date.isnot(None), Review.sentiment.isnot(None))
-        .group_by("month", Review.sentiment)
-        .order_by("month")
     )
+    if start_date:
+        q = q.where(Review.review_date >= start_date)
+    if end_date:
+        q = q.where(Review.review_date <= end_date)
+    q = q.group_by("month", Review.sentiment).order_by("month")
+
+    result = await db.execute(q)
     monthly_map = {}
     for row in result.all():
         m = row.month.strftime("%Y-%m") if row.month else "unknown"
@@ -124,9 +159,20 @@ async def trends(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/sources")
-async def sources(db: AsyncSession = Depends(get_db)):
+async def sources(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """Per-source breakdown."""
-    # Count reviews per source
+    # Build review join condition with date filters
+    join_conds = [Review.source_id == Source.id]
+    if start_date:
+        join_conds.append(Review.review_date >= start_date)
+    if end_date:
+        join_conds.append(Review.review_date <= end_date)
+    review_join = and_(*join_conds)
+
     review_result = await db.execute(
         select(
             Source.id,
@@ -137,7 +183,7 @@ async def sources(db: AsyncSession = Depends(get_db)):
             func.avg(Review.rating).label("avg_rating"),
             func.avg(Review.sentiment_score).label("avg_sentiment"),
         )
-        .outerjoin(Review, Review.source_id == Source.id)
+        .outerjoin(Review, review_join)
         .where(Source.is_active.is_(True))
         .group_by(Source.id, Source.name, Source.region, Source.source_type)
     )
@@ -155,9 +201,16 @@ async def sources(db: AsyncSession = Depends(get_db)):
         }
 
     # Count articles per source
+    art_join_conds = [Article.source_id == Source.id]
+    if start_date:
+        art_join_conds.append(Article.published_date >= start_date)
+    if end_date:
+        art_join_conds.append(Article.published_date <= end_date)
+    art_join = and_(*art_join_conds)
+
     article_result = await db.execute(
         select(Source.id, func.count(Article.id).label("article_count"))
-        .outerjoin(Article, Article.source_id == Source.id)
+        .outerjoin(Article, art_join)
         .where(Source.is_active.is_(True))
         .group_by(Source.id)
     )
@@ -171,15 +224,23 @@ async def sources(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/web-mentions")
-async def web_mentions(db: AsyncSession = Depends(get_db)):
+async def web_mentions(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """Latest articles from web search sources."""
-    result = await db.execute(
+    q = (
         select(Article, Source.name)
         .join(Source, Article.source_id == Source.id)
         .where(Source.source_type == "web_search")
-        .order_by(Article.published_date.desc().nullslast(), Article.id.desc())
-        .limit(20)
     )
+    if start_date:
+        q = q.where(Article.published_date >= start_date)
+    if end_date:
+        q = q.where(Article.published_date <= end_date)
+    q = q.order_by(Article.published_date.desc().nullslast(), Article.id.desc()).limit(20)
+    result = await db.execute(q)
     rows = result.all()
     return {
         "mentions": [
@@ -198,7 +259,11 @@ async def web_mentions(db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/insights")
-async def insights(db: AsyncSession = Depends(get_db)):
+async def insights(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
     """LLM-generated recommendations."""
     # Get insights
     insight_results = await get_analysis_results(db, "insight")

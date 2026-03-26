@@ -1,4 +1,5 @@
 from __future__ import annotations
+from datetime import date
 from sqlalchemy import func, select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -15,6 +16,8 @@ async def get_reviews(
     max_rating: float | None = None,
     sentiment: str | None = None,
     search: str | None = None,
+    start_date: date | None = None,
+    end_date: date | None = None,
 ) -> tuple[list[Review], int]:
     q = select(Review)
     count_q = select(func.count()).select_from(Review)
@@ -31,6 +34,10 @@ async def get_reviews(
     if search:
         like = f"%{search}%"
         filters.append(or_(Review.title.ilike(like), Review.body.ilike(like)))
+    if start_date is not None:
+        filters.append(Review.review_date >= start_date)
+    if end_date is not None:
+        filters.append(Review.review_date <= end_date)
 
     for f in filters:
         q = q.where(f)
@@ -46,21 +53,53 @@ async def get_reviews(
     return list(result.scalars().all()), total
 
 
-async def get_review_stats(db: AsyncSession) -> dict:
-    total = await db.scalar(select(func.count()).select_from(Review)) or 0
-    avg_rating = await db.scalar(select(func.avg(Review.rating))) or 0
-    avg_sentiment = await db.scalar(select(func.avg(Review.sentiment_score))) or 0
+def _date_filters(start_date: date | None, end_date: date | None) -> list:
+    filters = []
+    if start_date is not None:
+        filters.append(Review.review_date >= start_date)
+    if end_date is not None:
+        filters.append(Review.review_date <= end_date)
+    return filters
+
+
+async def get_review_stats(
+    db: AsyncSession,
+    start_date: date | None = None,
+    end_date: date | None = None,
+) -> dict:
+    df = _date_filters(start_date, end_date)
+
+    base = select(func.count()).select_from(Review)
+    for f in df:
+        base = base.where(f)
+    total = await db.scalar(base) or 0
+
+    avg_q = select(func.avg(Review.rating)).select_from(Review)
+    for f in df:
+        avg_q = avg_q.where(f)
+    avg_rating = await db.scalar(avg_q) or 0
+
+    sent_q = select(func.avg(Review.sentiment_score)).select_from(Review)
+    for f in df:
+        sent_q = sent_q.where(f)
+    avg_sentiment = await db.scalar(sent_q) or 0
 
     sentiment_counts = {}
     for sent in ["POS", "NEU", "NEG"]:
-        cnt = await db.scalar(select(func.count()).select_from(Review).where(Review.sentiment == sent)) or 0
+        q = select(func.count()).select_from(Review).where(Review.sentiment == sent)
+        for f in df:
+            q = q.where(f)
+        cnt = await db.scalar(q) or 0
         sentiment_counts[sent] = cnt
 
-    source_counts_result = await db.execute(
+    src_q = (
         select(Source.name, func.count())
         .join(Review, Review.source_id == Source.id)
-        .group_by(Source.name)
     )
+    for f in df:
+        src_q = src_q.where(f)
+    src_q = src_q.group_by(Source.name)
+    source_counts_result = await db.execute(src_q)
     source_counts = {name: cnt for name, cnt in source_counts_result.all()}
 
     return {

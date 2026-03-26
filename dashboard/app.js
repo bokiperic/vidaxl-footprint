@@ -3,9 +3,40 @@ let reviewPage = 1;
 let sentimentDoughnutChart = null;
 let sentimentTrendChart = null;
 let sourceBarChart = null;
+let dateRangeStart = null;
+let dateRangeEnd = null;
 
 // ---- Init ----
 document.addEventListener('DOMContentLoaded', () => {
+    loadAllData();
+    document.addEventListener('click', (e) => {
+        const popup = document.getElementById('date-picker-popup');
+        const btn = document.getElementById('btn-date-filter');
+        if (!popup.contains(e.target) && e.target !== btn) {
+            popup.classList.add('hidden');
+        }
+    });
+    // Toggle placeholder visibility on month inputs + click anywhere to open picker
+    for (const id of ['date-start', 'date-end']) {
+        const input = document.getElementById(id);
+        const placeholder = document.getElementById(id + '-placeholder');
+        input.addEventListener('change', () => {
+            if (input.value) {
+                placeholder.classList.add('has-value');
+                input.classList.add('has-value');
+            } else {
+                placeholder.classList.remove('has-value');
+                input.classList.remove('has-value');
+            }
+        });
+        // Make the whole wrap area open the picker on click
+        input.parentElement.addEventListener('click', () => {
+            try { input.showPicker(); } catch (_) { input.focus(); }
+        });
+    }
+});
+
+function loadAllData() {
     loadOverview();
     loadComplaints();
     loadProducts();
@@ -13,8 +44,100 @@ document.addEventListener('DOMContentLoaded', () => {
     loadSources();
     loadInsights();
     loadWebMentions();
+    reviewPage = 1;
+    document.getElementById('reviews-feed').innerHTML = '';
     loadReviews();
-});
+}
+
+// ---- Date Range ----
+function dateParams() {
+    let params = '';
+    if (dateRangeStart) params += `&start_date=${dateRangeStart}-01`;
+    if (dateRangeEnd) {
+        // end of month: use last day
+        const [y, m] = dateRangeEnd.split('-').map(Number);
+        const lastDay = new Date(y, m, 0).getDate();
+        params += `&end_date=${dateRangeEnd}-${String(lastDay).padStart(2, '0')}`;
+    }
+    return params;
+}
+
+function toggleDatePicker() {
+    document.getElementById('date-picker-popup').classList.toggle('hidden');
+}
+
+function currentMonth() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function syncInputVisuals(id, value) {
+    const input = document.getElementById(id);
+    const placeholder = document.getElementById(id + '-placeholder');
+    input.value = value || '';
+    if (value) {
+        input.classList.add('has-value');
+        placeholder.classList.add('has-value');
+    } else {
+        input.classList.remove('has-value');
+        placeholder.classList.remove('has-value');
+    }
+}
+
+function applyDateRange() {
+    let start = document.getElementById('date-start').value || null;
+    let end = document.getElementById('date-end').value || null;
+
+    // Only "To" selected without "From" → clear both (All Time)
+    if (!start && end) {
+        start = null;
+        end = null;
+    }
+
+    // Only "From" selected without "To" → default "To" to current month
+    if (start && !end) {
+        end = currentMonth();
+    }
+
+    // If "From" is after "To", swap them
+    if (start && end && start > end) {
+        [start, end] = [end, start];
+    }
+
+    dateRangeStart = start;
+    dateRangeEnd = end;
+    syncInputVisuals('date-start', start);
+    syncInputVisuals('date-end', end);
+    updateDateLabel();
+    document.getElementById('date-picker-popup').classList.add('hidden');
+    loadAllData();
+}
+
+function clearDateRange() {
+    dateRangeStart = null;
+    dateRangeEnd = null;
+    syncInputVisuals('date-start', null);
+    syncInputVisuals('date-end', null);
+    updateDateLabel();
+    document.getElementById('date-picker-popup').classList.add('hidden');
+    loadAllData();
+}
+
+function updateDateLabel() {
+    const label = document.getElementById('date-range-label');
+    if (!dateRangeStart && !dateRangeEnd) {
+        label.textContent = 'All Time';
+        return;
+    }
+    const fmt = (v) => {
+        const [y, m] = v.split('-');
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return `${months[parseInt(m)-1]} ${y}`;
+    };
+    const s = dateRangeStart ? fmt(dateRangeStart) : '...';
+    const e = dateRangeEnd ? fmt(dateRangeEnd) : '...';
+    label.textContent = `${s} – ${e}`;
+}
 
 // ---- API helpers ----
 async function api(path) {
@@ -61,7 +184,7 @@ async function triggerAnalysis() {
 // ---- Overview / KPI ----
 async function loadOverview() {
     try {
-        const data = await api('/api/v1/dashboard/overview');
+        const data = await api('/api/v1/dashboard/overview?' + dateParams());
         document.getElementById('kpi-total').textContent = data.total_reviews.toLocaleString();
         document.getElementById('kpi-rating').textContent = data.avg_rating ? `${data.avg_rating}/5.0` : '—';
         document.getElementById('kpi-sentiment').textContent = data.avg_sentiment_score ? `${(data.avg_sentiment_score * 100).toFixed(0)}%` : '—';
@@ -101,7 +224,7 @@ function renderSentimentDoughnut(pos, neu, neg) {
 // ---- Trends ----
 async function loadTrends() {
     try {
-        const data = await api('/api/v1/dashboard/trends');
+        const data = await api('/api/v1/dashboard/trends?' + dateParams());
         const monthly = data.monthly || [];
         if (!monthly.length) return;
 
@@ -135,7 +258,7 @@ async function loadTrends() {
 // ---- Complaints ----
 async function loadComplaints() {
     try {
-        const data = await api('/api/v1/dashboard/complaints');
+        const data = await api('/api/v1/dashboard/complaints?' + dateParams());
         const tbody = document.getElementById('complaints-body');
         tbody.innerHTML = '';
         for (const c of (data.complaints || [])) {
@@ -163,7 +286,7 @@ async function loadComplaints() {
 // ---- Products ----
 async function loadProducts() {
     try {
-        const data = await api('/api/v1/dashboard/products');
+        const data = await api('/api/v1/dashboard/products?' + dateParams());
         fillProductTable('best-products-body', data.best || []);
         fillProductTable('worst-products-body', data.worst || []);
     } catch (e) {
@@ -187,7 +310,7 @@ function fillProductTable(id, items) {
 // ---- Sources ----
 async function loadSources() {
     try {
-        const data = await api('/api/v1/dashboard/sources');
+        const data = await api('/api/v1/dashboard/sources?' + dateParams());
         const sources = data.sources || [];
         const withItems = sources.filter(s => s.item_count > 0);
 
@@ -236,7 +359,7 @@ async function loadSources() {
 // ---- Insights ----
 async function loadInsights() {
     try {
-        const data = await api('/api/v1/dashboard/insights');
+        const data = await api('/api/v1/dashboard/insights?' + dateParams());
         const container = document.getElementById('insights-content');
 
         if (!data.insights?.recommendations && !data.trends?.trends) {
@@ -279,7 +402,7 @@ async function loadInsights() {
 // ---- Web Mentions ----
 async function loadWebMentions() {
     try {
-        const data = await api('/api/v1/dashboard/web-mentions');
+        const data = await api('/api/v1/dashboard/web-mentions?' + dateParams());
         const feed = document.getElementById('web-mentions-feed');
         const mentions = data.mentions || [];
 
@@ -314,7 +437,7 @@ async function loadWebMentions() {
 // ---- Reviews Feed ----
 async function loadReviews() {
     try {
-        const data = await api(`/api/v1/reviews?page=${reviewPage}&page_size=15`);
+        const data = await api(`/api/v1/reviews?page=${reviewPage}&page_size=15${dateParams()}`);
         const feed = document.getElementById('reviews-feed');
 
         for (const r of (data.items || [])) {

@@ -1,4 +1,6 @@
 from __future__ import annotations
+from datetime import date
+from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -18,9 +20,14 @@ async def list_reviews(
     max_rating: float | None = None,
     sentiment: str | None = None,
     search: str | None = Query(None, max_length=200),
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
-    reviews, total = await get_reviews(db, page, page_size, source_id, min_rating, max_rating, sentiment, search)
+    reviews, total = await get_reviews(
+        db, page, page_size, source_id, min_rating, max_rating, sentiment, search,
+        start_date=start_date, end_date=end_date,
+    )
     items = []
     for r in reviews:
         out = ReviewOut.model_validate(r)
