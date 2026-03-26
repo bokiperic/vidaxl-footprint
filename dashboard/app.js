@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadTrends();
     loadSources();
     loadInsights();
+    loadWebMentions();
     loadReviews();
 });
 
@@ -259,6 +260,41 @@ async function loadInsights() {
         container.innerHTML = html || '<p class="placeholder">No insights available</p>';
     } catch (e) {
         console.error('Insights load failed:', e);
+    }
+}
+
+// ---- Web Mentions ----
+async function loadWebMentions() {
+    try {
+        const data = await api('/api/v1/dashboard/web-mentions');
+        const feed = document.getElementById('web-mentions-feed');
+        const mentions = data.mentions || [];
+
+        if (!mentions.length) {
+            feed.innerHTML = '<p class="placeholder">No web mentions yet. Run scraping to discover brand mentions across the web.</p>';
+            return;
+        }
+
+        feed.innerHTML = '';
+        for (const m of mentions) {
+            const div = document.createElement('div');
+            div.className = 'review-item';
+
+            const sentBadge = m.sentiment ? `<span class="sentiment-badge sentiment-${esc(m.sentiment)}">${esc(m.sentiment)}</span>` : '';
+            const sourceBadge = `<span class="topic-tag">${esc(m.source_name)}</span>`;
+
+            div.innerHTML = `
+                <div class="review-header">
+                    <span>${sourceBadge} ${sentBadge}</span>
+                    <span class="review-date">${m.published_date || ''}</span>
+                </div>
+                ${m.title ? `<div class="review-title"><a href="${esc(m.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">${esc(m.title)}</a></div>` : ''}
+                ${m.body ? `<div class="review-body">${esc(m.body)}${m.body.length >= 300 ? '...' : ''}</div>` : ''}
+            `;
+            feed.appendChild(div);
+        }
+    } catch (e) {
+        console.error('Web mentions load failed:', e);
     }
 }
 

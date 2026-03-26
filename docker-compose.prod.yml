@@ -28,6 +28,7 @@ services:
       AUTH_USERNAME: ${AUTH_USERNAME:-levi9Hunkemoller}
       AUTH_PASSWORD: ${AUTH_PASSWORD:-Hunk3moll3r!}
       AUTH_SECRET: ${AUTH_SECRET}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy
