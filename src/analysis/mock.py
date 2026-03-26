@@ -41,16 +41,16 @@ def mock_sentiment(text: str | None) -> tuple[str, float, list[str]]:
 
 def mock_top_complaints() -> list[dict]:
     return [
-        {"theme": "Sizing Inconsistency", "frequency": 342, "severity": "high", "example_quote": "Ordered my usual size but it was way too small, sizing is all over the place.", "category": "product_quality"},
-        {"theme": "Fabric Quality Decline", "frequency": 287, "severity": "high", "example_quote": "Material feels cheap and started pilling after one wash.", "category": "product_quality"},
-        {"theme": "Bra Fit Issues", "frequency": 198, "severity": "high", "example_quote": "The bra cups are shaped oddly and don't provide proper support.", "category": "product_quality"},
-        {"theme": "Delivery Delays", "frequency": 176, "severity": "medium", "example_quote": "Waited 2 weeks for delivery, no tracking updates provided.", "category": "delivery"},
-        {"theme": "Refund Difficulties", "frequency": 154, "severity": "medium", "example_quote": "Still waiting for my refund after 4 weeks of returning items.", "category": "returns"},
-        {"theme": "Poor Customer Service", "frequency": 132, "severity": "medium", "example_quote": "Email support took 10 days to respond with a generic reply.", "category": "customer_service"},
-        {"theme": "Return Process Complexity", "frequency": 98, "severity": "medium", "example_quote": "Return shipping costs are too high and the process is confusing.", "category": "returns"},
-        {"theme": "Color Mismatch", "frequency": 87, "severity": "low", "example_quote": "The color looked completely different from the website photos.", "category": "product_quality"},
-        {"theme": "Website/Ordering Issues", "frequency": 65, "severity": "low", "example_quote": "Website showed item in stock but order was cancelled next day.", "category": "website"},
-        {"theme": "Comfort Issues", "frequency": 54, "severity": "medium", "example_quote": "The underwire digs in after just an hour of wearing.", "category": "product_quality"},
+        {"theme": "Sizing Inconsistency", "frequency": 342, "severity": "high", "example_quote": "Ordered my usual size but it was way too small, sizing is all over the place.", "category": "product_quality", "source_name": "Trustpilot DE", "source_url": "https://de.trustpilot.com/review/hunkemoller.de"},
+        {"theme": "Fabric Quality Decline", "frequency": 287, "severity": "high", "example_quote": "Material feels cheap and started pilling after one wash.", "category": "product_quality", "source_name": "Trustpilot NL", "source_url": "https://nl.trustpilot.com/review/hunkemoller.nl"},
+        {"theme": "Bra Fit Issues", "frequency": 198, "severity": "high", "example_quote": "The bra cups are shaped oddly and don't provide proper support.", "category": "product_quality", "source_name": "Trustpilot COM", "source_url": "https://www.trustpilot.com/review/hunkemoller.com"},
+        {"theme": "Delivery Delays", "frequency": 176, "severity": "medium", "example_quote": "Waited 2 weeks for delivery, no tracking updates provided.", "category": "delivery", "source_name": "Reviews.io", "source_url": "https://www.reviews.io/company-reviews/store/hunkemoller"},
+        {"theme": "Refund Difficulties", "frequency": 154, "severity": "medium", "example_quote": "Still waiting for my refund after 4 weeks of returning items.", "category": "returns", "source_name": "PissedConsumer", "source_url": "https://www.pissedconsumer.com/hunkemoller.html"},
+        {"theme": "Poor Customer Service", "frequency": 132, "severity": "medium", "example_quote": "Email support took 10 days to respond with a generic reply.", "category": "customer_service", "source_name": "Trustpilot BE", "source_url": "https://www.trustpilot.com/review/hunkemoller.be"},
+        {"theme": "Return Process Complexity", "frequency": 98, "severity": "medium", "example_quote": "Return shipping costs are too high and the process is confusing.", "category": "returns", "source_name": "Trustpilot DE", "source_url": "https://de.trustpilot.com/review/hunkemoller.de"},
+        {"theme": "Color Mismatch", "frequency": 87, "severity": "low", "example_quote": "The color looked completely different from the website photos.", "category": "product_quality", "source_name": "Trustpilot NL", "source_url": "https://nl.trustpilot.com/review/hunkemoller.nl"},
+        {"theme": "Website/Ordering Issues", "frequency": 65, "severity": "low", "example_quote": "Website showed item in stock but order was cancelled next day.", "category": "website", "source_name": "Reviews.io", "source_url": "https://www.reviews.io/company-reviews/store/hunkemoller"},
+        {"theme": "Comfort Issues", "frequency": 54, "severity": "medium", "example_quote": "The underwire digs in after just an hour of wearing.", "category": "product_quality", "source_name": "Trustpilot COM", "source_url": "https://www.trustpilot.com/review/hunkemoller.com"},
     ]
 
 

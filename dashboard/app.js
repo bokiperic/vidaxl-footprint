@@ -140,12 +140,17 @@ async function loadComplaints() {
         for (const c of (data.complaints || [])) {
             const tr = document.createElement('tr');
             tr.setAttribute('data-testid', 'complaints-row');
+            const sourceCell = c.source_url
+                ? `<a href="${esc(c.source_url)}" target="_blank" rel="noopener noreferrer" class="complaint-source-link">${esc(c.source_name || 'Source')}</a>`
+                : esc(c.source_name || '');
+
             tr.innerHTML = `
                 <td><strong>${esc(c.theme)}</strong></td>
                 <td>${c.frequency}</td>
                 <td><span class="severity-${esc(c.severity)}">${esc(c.severity)}</span></td>
                 <td>${esc(c.category || '')}</td>
                 <td><em>"${esc(c.example_quote || '')}"</em></td>
+                <td>${sourceCell}</td>
             `;
             tbody.appendChild(tr);
         }

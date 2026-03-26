@@ -4,7 +4,7 @@ import datetime
 import logging
 from collections import Counter
 
-from sqlalchemy import func, select
+from sqlalchemy import String, func, select, type_coerce
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.config import settings
@@ -106,6 +106,9 @@ async def _stage2_themes(db: AsyncSession, run_id: int, use_mock: bool) -> list[
         from src.analysis.themes import aggregate_themes
         complaints = await aggregate_themes(dict(all_topics), total)
 
+        # Enrich complaints with source info by finding a matching review
+        await _enrich_complaints_with_sources(db, complaints)
+
     # Store result
     ar = AnalysisResult(
         analysis_run_id=run_id,
@@ -116,6 +119,33 @@ async def _stage2_themes(db: AsyncSession, run_id: int, use_mock: bool) -> list[
     db.add(ar)
     await db.flush()
     return complaints
+
+
+async def _enrich_complaints_with_sources(db: AsyncSession, complaints: list[dict]):
+    """Find a representative source for each complaint theme by matching topic keywords."""
+    from sqlalchemy.orm import selectinload
+
+    for complaint in complaints:
+        theme_words = complaint.get("theme", "").lower().split()
+        if not theme_words:
+            continue
+
+        # Search for a review whose topics contain a keyword from the theme
+        for word in theme_words:
+            if len(word) < 4:
+                continue
+            result = await db.execute(
+                select(Review)
+                .options(selectinload(Review.source))
+                .where(Review.topics.isnot(None))
+                .where(type_coerce(Review.topics, String).ilike(f"%{word}%"))
+                .limit(1)
+            )
+            review = result.scalars().first()
+            if review and review.source:
+                complaint["source_name"] = review.source.name
+                complaint["source_url"] = review.source.base_url
+                break
 
 
 async def _stage3_trends(db: AsyncSession, run_id: int, complaints: list[dict], use_mock: bool):

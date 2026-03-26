@@ -114,6 +114,21 @@ td { padding: 0.5rem; border-bottom: 1px solid var(--border); }
 .severity-medium { color: var(--neutral); font-weight: 600; }
 .severity-low { color: var(--positive); font-weight: 600; }
 
+#complaints-table th:first-child,
+#complaints-table td:first-child { width: 15%; }
+
+.complaint-source-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.complaint-source-link:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
+
 /* Products */
 .products-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
 .products-row > div > h2 { font-size: 1rem; margin-bottom: 1rem; }
