@@ -25,9 +25,36 @@ async def overview(db: AsyncSession = Depends(get_db)):
 async def complaints(db: AsyncSession = Depends(get_db)):
     """Top complaints with frequency and quotes."""
     results = await get_analysis_results(db, "top_complaints")
-    if results:
-        return results[0].data
-    return {"complaints": []}
+    if not results:
+        return {"complaints": []}
+
+    data = results[0].data
+    complaint_list = data.get("complaints", [])
+
+    # Enrich complaints missing source info by finding a matching review
+    needs_enrichment = [c for c in complaint_list if not c.get("source_url")]
+    if needs_enrichment:
+        from sqlalchemy import String, type_coerce
+        from sqlalchemy.orm import selectinload
+        for c in needs_enrichment:
+            theme_words = c.get("theme", "").lower().split()
+            for word in theme_words:
+                if len(word) < 4:
+                    continue
+                result = await db.execute(
+                    select(Review)
+                    .options(selectinload(Review.source))
+                    .where(Review.topics.isnot(None))
+                    .where(type_coerce(Review.topics, String).ilike(f"%{word}%"))
+                    .limit(1)
+                )
+                review = result.scalars().first()
+                if review and review.source:
+                    c["source_name"] = review.source.name
+                    c["source_url"] = review.source.base_url
+                    break
+
+    return {"complaints": complaint_list}
 
 
 @router.get("/products")
