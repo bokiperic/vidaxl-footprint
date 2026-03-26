@@ -4,7 +4,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_db
-from src.models import Review, Source, AnalysisResult, AnalysisRun
+from src.models import Article, Review, Source, AnalysisResult, AnalysisRun
 from src.config import settings
 from src.services.analysis_service import get_analysis_results
 from src.services.review_service import get_review_stats
@@ -130,13 +130,14 @@ async def sources(db: AsyncSession = Depends(get_db)):
         select(
             Source.name,
             Source.region,
+            Source.source_type,
             func.count(Review.id).label("review_count"),
             func.avg(Review.rating).label("avg_rating"),
             func.avg(Review.sentiment_score).label("avg_sentiment"),
         )
         .outerjoin(Review, Review.source_id == Source.id)
         .where(Source.is_active.is_(True))
-        .group_by(Source.id, Source.name, Source.region)
+        .group_by(Source.id, Source.name, Source.region, Source.source_type)
         .order_by(func.count(Review.id).desc())
     )
     return {
@@ -144,11 +145,39 @@ async def sources(db: AsyncSession = Depends(get_db)):
             {
                 "name": r[0],
                 "region": r[1],
-                "review_count": r[2],
-                "avg_rating": round(float(r[3]), 2) if r[3] else None,
-                "avg_sentiment": round(float(r[4]), 2) if r[4] else None,
+                "source_type": r[2],
+                "review_count": r[3],
+                "avg_rating": round(float(r[4]), 2) if r[4] else None,
+                "avg_sentiment": round(float(r[5]), 2) if r[5] else None,
             }
             for r in result.all()
+        ]
+    }
+
+
+@router.get("/web-mentions")
+async def web_mentions(db: AsyncSession = Depends(get_db)):
+    """Latest articles from web search sources."""
+    result = await db.execute(
+        select(Article, Source.name)
+        .join(Source, Article.source_id == Source.id)
+        .where(Source.source_type == "web_search")
+        .order_by(Article.published_date.desc().nullslast(), Article.id.desc())
+        .limit(20)
+    )
+    rows = result.all()
+    return {
+        "mentions": [
+            {
+                "id": article.id,
+                "url": article.url,
+                "title": article.title,
+                "body": (article.body or "")[:300],
+                "published_date": str(article.published_date) if article.published_date else None,
+                "sentiment": article.sentiment,
+                "source_name": source_name,
+            }
+            for article, source_name in rows
         ]
     }
 

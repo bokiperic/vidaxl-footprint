@@ -9,10 +9,15 @@ class Settings(BaseSettings):
     USE_BEDROCK: bool = False
     AWS_REGION: str = "eu-central-1"
     BEDROCK_MODEL_ID: str = "eu.anthropic.claude-haiku-4-5-20251001-v1:0"
+    TAVILY_API_KEY: str = ""
     API_KEY: str = ""
     AUTH_USERNAME: str = ""
     AUTH_PASSWORD: str = ""
     AUTH_SECRET: str = ""
+
+    @property
+    def use_mock_search(self) -> bool:
+        return not self.TAVILY_API_KEY
 
     @property
     def use_mock_analysis(self) -> bool:

@@ -25,6 +25,7 @@ services:
       USE_BEDROCK: ${USE_BEDROCK:-false}
       AWS_REGION: ${AWS_REGION:-eu-central-1}
       BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-eu.anthropic.claude-haiku-4-5-20251001-v1:0}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
     depends_on:
       db:
         condition: service_healthy
